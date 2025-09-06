@@ -20,7 +20,9 @@ export default function CartPage() {
         if (mounted) setLoading(false);
       }
     })();
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   async function handleQty(item, delta) {
@@ -44,82 +46,126 @@ export default function CartPage() {
   }
 
   return (
-    <div className="w-full min-h-screen flex flex-col py-[40px] items-center">
-      {cart.length === 0 && (
-        <div className="text-gray-600 mb-6">Your cart is empty.</div>
-      )}
-
-      {cart.map((item) => (
-        <div
-          key={item.productId}
-          className="w-[900px] h-[150px] m-[10px] shadow-2xl flex flex-row items-center transition-transform hover:-translate-y-1 duration-200"
-        >
-          <img
-            src={item.image}
-            alt={item.name}
-            className="w-[80px] h-[80px] ml-[20px] object-cover rounded-md"
-          />
-          <div className="w-[320px] h-full flex flex-col justify-center pl-[10px]">
-            <span className="font-bold line-clamp-2">{item.name}</span>
-            <span className="font-semibold">Rs {(item.price).toFixed(2)}</span>
-          </div>
-
-          <div className="w-[190px] h-full flex flex-row justify-center items-center">
-            <button
-              className="cursor-pointer text-3xl px-3"
-              onClick={() => handleQty(item, -1)}
-              aria-label="Decrease quantity"
-            >
-              -
-            </button>
-            <span className="mx-[10px] text-xl">{item.quantity}</span>
-            <button
-              className="cursor-pointer text-xl px-3"
-              onClick={() => handleQty(item, 1)}
-              aria-label="Increase quantity"
-            >
-              +
-            </button>
-          </div>
-
-          <div className="w-[190px] h-full flex justify-end items-center pr-[20px]">
-            <span className="font-bold">
-              Rs {(item.price * item.quantity).toFixed(2)}
-            </span>
-          </div>
-
-          <button
-            className="w-[30px] h-[30px] bg-accent text-white font-bold hover:bg-red-500 cursor-pointer rounded-full mr-[20px] flex items-center justify-center"
-            onClick={() => handleDelete(item)}
-            aria-label="Remove item"
-            title="Remove"
-          >
-            <RiDeleteBin5Fill />
-          </button>
-        </div>
-      ))}
-
-      <div className="w-[900px] h-[100px] m-[10px] shadow-2xl flex flex-row items-center justify-end relative">
-        <span className="font-bold text-xl mr-[20px]">
-          Total: Rs {total.toFixed(2)}
-        </span>
-
-        <button
-          className="absolute left-10 bg-accent text-white px-5 py-2 rounded-full font-semibold hover:bg-red-500 cursor-pointer transition"
-          onClick={() => {
-            // pass current state items to checkout (server or local, both ok)
-            navigate("/checkout", { state: { items: cart } });
-          }}
-        >
-          Checkout
-        </button>
-
-        {!isLoggedIn() && (
-          <span className="absolute right-6 text-sm text-gray-500">
-            (Login to save your cart)
-          </span>
+    <div className="w-full min-h-screen bg-white">
+      <main className="container max-w-4xl mx-auto px-4 sm:px-6 py-10">
+        {cart.length === 0 && (
+          <div className="text-gray-600 mb-6">Your cart is empty.</div>
         )}
-      </div>
+
+        {/* Items */}
+        <div className="flex flex-col gap-4">
+          {cart.map((item) => (
+            <div
+              key={item.productId}
+              className="
+                w-full rounded-2xl bg-white shadow-lg
+                p-4 sm:p-5
+              "
+            >
+              <div className="grid grid-cols-12 gap-3 sm:gap-4 items-center">
+                {/* image */}
+                <div className="col-span-3 sm:col-span-2">
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    className="w-full aspect-square object-cover rounded-md"
+                  />
+                </div>
+
+                {/* name + unit price */}
+                <div className="col-span-9 sm:col-span-5">
+                  <span className="block font-semibold leading-snug line-clamp-2">
+                    {item.name}
+                  </span>
+                  <span className="mt-1 inline-block text-sm text-gray-600">
+                    Unit price:&nbsp;
+                    <span className="font-semibold">
+                      Rs {(item.price || 0).toFixed(2)}
+                    </span>
+                  </span>
+                </div>
+
+                {/* qty controls (mobile: new row; desktop: center) */}
+                <div className="col-span-6 sm:col-span-3 flex items-center justify-center sm:justify-center gap-3">
+                  <button
+                    className="w-9 h-9 text-xl rounded-full border hover:bg-gray-50 active:scale-95 transition cursor-pointer"
+                    onClick={() => handleQty(item, -1)}
+                    aria-label="Decrease quantity"
+                    disabled={item.quantity <= 1}
+                  >
+                    −
+                  </button>
+                  <span className="min-w-[2ch] text-center text-lg">
+                    {item.quantity}
+                  </span>
+                  <button
+                    className="w-9 h-9 text-xl rounded-full border hover:bg-gray-50 active:scale-95 transition cursor-pointer"
+                    onClick={() => handleQty(item, 1)}
+                    aria-label="Increase quantity"
+                  >
+                    +
+                  </button>
+                </div>
+
+                {/* line total + delete (right on desktop, split on mobile) */}
+                <div className="col-span-6 sm:col-span-2 flex items-center justify-between sm:justify-end gap-3">
+                  <span className="font-bold">
+                    Rs {(item.price * item.quantity).toFixed(2)}
+                  </span>
+                  <button
+                    className="
+                      w-9 h-9 rounded-full
+                      bg-accent text-white hover:bg-red-500
+                      flex items-center justify-center
+                      active:scale-95 transition cursor-pointer
+                    "
+                    onClick={() => handleDelete(item)}
+                    aria-label="Remove item"
+                    title="Remove"
+                  >
+                    <RiDeleteBin5Fill />
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Summary */}
+        {cart.length > 0 && (
+          <div
+            className="
+              mt-4 w-full rounded-2xl bg-white shadow-lg
+              p-4 sm:p-5
+              flex flex-col sm:flex-row items-center gap-3 sm:gap-4
+              justify-between
+            "
+          >
+            <div className="text-lg sm:text-xl font-semibold">
+              Total: <span className="font-bold">Rs {total.toFixed(2)}</span>
+            </div>
+
+            <div className="flex items-center gap-3">
+              {!isLoggedIn() && (
+                <span className="text-xs sm:text-sm text-gray-500">
+                  (Login to save your cart)
+                </span>
+              )}
+              <button
+                className="
+                  bg-accent text-white px-5 py-2 rounded-full font-semibold
+                  hover:bg-red-500 active:scale-95 transition cursor-pointer
+                "
+                onClick={() => {
+                  navigate("/checkout", { state: { items: cart } });
+                }}
+              >
+                Checkout
+              </button>
+            </div>
+          </div>
+        )}
+      </main>
     </div>
   );
 }
