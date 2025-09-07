@@ -39,7 +39,8 @@ export default function RegisterPage() {
   return (
     <div className="relative min-h-screen w-full overflow-hidden">
       {/* Background image */}
-      <div className="absolute inset-0 bg-[url(./loginbg.jpg)] bg-cover bg-center bg-no-repeat" />
+      <div className="absolute inset-0 bg-[url('/loginbg.jpg')] bg-cover bg-center bg-no-repeat" />
+
       {/* Mobile overlay for readability */}
       <div className="absolute inset-0 bg-black/50 md:bg-black/30" />
 
