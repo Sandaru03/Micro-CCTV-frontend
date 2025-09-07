@@ -46,7 +46,8 @@ export default function LoginPage() {
   return (
     <div className="relative min-h-screen w-full overflow-hidden">
       {/* Background */}
-      <div className="absolute inset-0 bg-[url(./loginbg.jpg)] bg-cover bg-center bg-no-repeat" />
+      <div className="absolute inset-0 bg-[url('/loginbg.jpg')] bg-cover bg-center bg-no-repeat" />
+
       {/* Overlay for readability */}
       <div className="absolute inset-0 bg-black/50 md:bg-black/30" />
 
