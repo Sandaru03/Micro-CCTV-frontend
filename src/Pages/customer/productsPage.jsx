@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Loader from "../../assets/components/loader";
 import ProductCard from "../../assets/components/productCard";
 import { HiAdjustments, HiX } from "react-icons/hi";
@@ -28,6 +28,26 @@ export default function ProductsPage() {
 
   // Mobile filter drawer
   const [filtersOpen, setFiltersOpen] = useState(false);
+
+  // 🔧 measure mobile top bar height to keep drawer below it
+  const topbarRef = useRef(null);
+  const [topOffset, setTopOffset] = useState(0);
+  const measureTopbar = () => {
+    const h = topbarRef.current?.getBoundingClientRect()?.height || 0;
+    setTopOffset(h);
+  };
+  useEffect(() => {
+    measureTopbar();
+    const onResize = () => measureTopbar();
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+  useEffect(() => {
+    // re-measure when opening drawer (or when controls inside change height)
+    if (filtersOpen) {
+      requestAnimationFrame(measureTopbar);
+    }
+  }, [filtersOpen, query, sort]);
 
   // Fetch products
   async function fetchProducts(searchTerm = "") {
@@ -272,7 +292,10 @@ export default function ProductsPage() {
       {/* Right side */}
       <main className="flex-1 min-h-screen overflow-y-auto">
         {/* Mobile top bar: search (quick) + filters + sort */}
-        <div className="md:hidden sticky top-0 z-20 bg-white/90 backdrop-blur border-b">
+        <div
+          ref={topbarRef}
+          className="md:hidden sticky top-0 z-20 bg-white/90 backdrop-blur border-b"
+        >
           <div className="p-4 flex flex-col gap-3">
             {/* quick search */}
             <div className="flex items-center gap-2">
@@ -287,7 +310,10 @@ export default function ProductsPage() {
                 />
               </div>
               <button
-                onClick={() => setFiltersOpen(true)}
+                onClick={() => {
+                  measureTopbar();
+                  setFiltersOpen(true);
+                }}
                 className="shrink-0 inline-flex items-center gap-2 px-3 py-2 rounded-xl border bg-white hover:bg-gray-50"
               >
                 <HiAdjustments />
@@ -372,13 +398,16 @@ export default function ProductsPage() {
         )}
       </main>
 
-      {/* Mobile filters drawer */}
+      {/* Mobile filters drawer — now starts below the header */}
       {filtersOpen && (
-        <div className="md:hidden fixed inset-0 z-30">
+        <div
+          className="md:hidden fixed left-0 right-0 z-30"
+          style={{ top: topOffset, bottom: 0 }}
+        >
           <div
             className="absolute inset-0 bg-black/40"
             onClick={() => setFiltersOpen(false)}
-          ></div>
+          />
           <div className="absolute left-0 top-0 h-full w-[85%] max-w-[360px] bg-gray-50 shadow-2xl p-6 overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
               <span className="text-lg font-bold">Filters</span>
