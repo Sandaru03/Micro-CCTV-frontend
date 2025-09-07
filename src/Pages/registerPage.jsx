@@ -4,36 +4,32 @@ import axios from "axios";
 import toast from "react-hot-toast";
 
 export default function RegisterPage() {
-  const navigate = useNavigate(); // useNavigate hook එක
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
     email: "",
     password: "",
     confirmPassword: "",
-    phone: ""
+    phone: "",
   });
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setFormData((s) => ({ ...s, [e.target.name]: e.target.value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (formData.password !== formData.confirmPassword) {
       toast.error("Passwords do not match!");
       return;
     }
-
     try {
       const res = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/users`,
         formData
       );
-      toast.success(res.data.message);
-
-      // Sign up success උනාම login page එකට navigate වෙනවා
+      toast.success(res.data.message || "Signed up successfully");
       navigate("/login");
     } catch (error) {
       toast.error(error.response?.data?.message || "Signup failed");
@@ -41,118 +37,160 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="w-full h-screen bg-[url(./loginbg.jpg)] bg-cover bg-center flex justify-end items-center">
-      {/* Transparent Box */}
-      <div className="w-[500px] h-[800px] backdrop-blur-2xl bg-white/10 border border-white/20 
-                      rounded-[30px] shadow-2xl text-white flex flex-col items-center p-8 mr-10">
-        <h1 className="text-4xl font-bold text-center mb-6">Sign Up</h1>
+    <div className="relative min-h-screen w-full overflow-hidden">
+      {/* Background image */}
+      <div className="absolute inset-0 bg-[url(./loginbg.jpg)] bg-cover bg-center bg-no-repeat" />
+      {/* Mobile overlay for readability */}
+      <div className="absolute inset-0 bg-black/50 md:bg-black/30" />
 
-        <form className="w-full flex flex-col gap-4" onSubmit={handleSubmit}>
-          {/* First Name */}
-          <div className="flex flex-col gap-2">
-            <span className="text-lg">First Name</span>
-            <input
-              type="text"
-              name="firstName"
-              value={formData.firstName}
-              onChange={handleChange}
-              className="w-full h-[45px] border border-white rounded-md px-3 
-                       bg-white/20 placeholder-white/60 focus:outline-none"
-              placeholder="Enter your first name"
-              required
-            />
-          </div>
+      {/* Content */}
+      <div className="relative z-10 flex items-center justify-center md:justify-end min-h-screen px-4 sm:px-6">
+        <div
+          className="
+            w-full max-w-md sm:max-w-lg lg:max-w-xl
+            rounded-[30px] border border-white/20 bg-white/10 backdrop-blur-2xl
+            shadow-2xl text-white
+            p-6 sm:p-8 md:mr-10
+          "
+        >
+          <h1 className="text-3xl sm:text-4xl font-bold text-center mb-6">
+            Sign Up
+          </h1>
 
-          {/* Last Name */}
-          <div className="flex flex-col gap-2">
-            <span className="text-lg">Last Name</span>
-            <input
-              type="text"
-              name="lastName"
-              value={formData.lastName}
-              onChange={handleChange}
-              className="w-full h-[45px] border border-white rounded-md px-3 
-                       bg-white/20 placeholder-white/60 focus:outline-none"
-              placeholder="Enter your last name"
-              required
-            />
-          </div>
+          <form className="w-full space-y-4" onSubmit={handleSubmit}>
+            {/* First + Last name (stack on mobile, 2-col on >=sm) */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="flex flex-col gap-2">
+                <label className="text-sm sm:text-base">First Name</label>
+                <input
+                  type="text"
+                  name="firstName"
+                  value={formData.firstName}
+                  onChange={handleChange}
+                  className="
+                    h-11 w-full rounded-md border border-white/40 px-3
+                    bg-white/20 placeholder-white/60
+                    focus:outline-none focus:ring-2 focus:ring-white/30
+                  "
+                  placeholder="Enter your first name"
+                  required
+                  autoComplete="given-name"
+                />
+              </div>
 
-          {/* Email */}
-          <div className="flex flex-col gap-2">
-            <span className="text-lg">Email</span>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              className="w-full h-[45px] border border-white rounded-md px-3 
-                       bg-white/20 placeholder-white/60 focus:outline-none"
-              placeholder="Enter your email"
-              required
-            />
-          </div>
+              <div className="flex flex-col gap-2">
+                <label className="text-sm sm:text-base">Last Name</label>
+                <input
+                  type="text"
+                  name="lastName"
+                  value={formData.lastName}
+                  onChange={handleChange}
+                  className="
+                    h-11 w-full rounded-md border border-white/40 px-3
+                    bg-white/20 placeholder-white/60
+                    focus:outline-none focus:ring-2 focus:ring-white/30
+                  "
+                  placeholder="Enter your last name"
+                  required
+                  autoComplete="family-name"
+                />
+              </div>
+            </div>
 
-          {/* Phone */}
-          <div className="flex flex-col gap-2">
-            <span className="text-lg">Phone</span>
-            <input
-              type="text"
-              name="phone"
-              value={formData.phone}
-              onChange={handleChange}
-              className="w-full h-[45px] border border-white rounded-md px-3 
-                       bg-white/20 placeholder-white/60 focus:outline-none"
-              placeholder="Enter your phone"
-            />
-          </div>
+            {/* Email */}
+            <div className="flex flex-col gap-2">
+              <label className="text-sm sm:text-base">Email</label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                className="
+                  h-11 w-full rounded-md border border-white/40 px-3
+                  bg-white/20 placeholder-white/60
+                  focus:outline-none focus:ring-2 focus:ring-white/30
+                "
+                placeholder="Enter your email"
+                required
+                autoComplete="email"
+              />
+            </div>
 
-          {/* Password */}
-          <div className="flex flex-col gap-2">
-            <span className="text-lg">Password</span>
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              className="w-full h-[45px] border border-white rounded-md px-3 
-                       bg-white/20 placeholder-white/60 focus:outline-none"
-              placeholder="Enter password"
-              required
-            />
-          </div>
+            {/* Phone */}
+            <div className="flex flex-col gap-2">
+              <label className="text-sm sm:text-base">Phone</label>
+              <input
+                type="tel"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                className="
+                  h-11 w-full rounded-md border border-white/40 px-3
+                  bg-white/20 placeholder-white/60
+                  focus:outline-none focus:ring-2 focus:ring-white/30
+                "
+                placeholder="Enter your phone"
+                autoComplete="tel"
+              />
+            </div>
 
-          {/* Confirm Password */}
-          <div className="flex flex-col gap-2">
-            <span className="text-lg">Confirm Password</span>
-            <input
-              type="password"
-              name="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              className="w-full h-[45px] border border-white rounded-md px-3 
-                       bg-white/20 placeholder-white/60 focus:outline-none"
-              placeholder="Confirm password"
-              required
-            />
-          </div>
+            {/* Password */}
+            <div className="flex flex-col gap-2">
+              <label className="text-sm sm:text-base">Password</label>
+              <input
+                type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                className="
+                  h-11 w-full rounded-md border border-white/40 px-3
+                  bg-white/20 placeholder-white/60
+                  focus:outline-none focus:ring-2 focus:ring-white/30
+                "
+                placeholder="Enter password"
+                required
+                autoComplete="new-password"
+              />
+            </div>
 
-          {/* Button */}
-          <button
-            type="submit"
-            className="w-full h-[45px] bg-red-500 rounded-xl text-white text-lg mt-4 
-             hover:bg-red-600 transition-all duration-300 cursor-pointer"
-          >
-            Create Account
-          </button>
-        </form>
+            {/* Confirm Password */}
+            <div className="flex flex-col gap-2">
+              <label className="text-sm sm:text-base">Confirm Password</label>
+              <input
+                type="password"
+                name="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                className="
+                  h-11 w-full rounded-md border border-white/40 px-3
+                  bg-white/20 placeholder-white/60
+                  focus:outline-none focus:ring-2 focus:ring-white/30
+                "
+                placeholder="Confirm password"
+                required
+                autoComplete="new-password"
+              />
+            </div>
 
-        <p className="mt-4 text-sm">
-          Already Have An Account?{" "}
-          <Link to="/login" className="text-red-400 underline">
-            Login
-          </Link>
-        </p>
+            {/* Button */}
+            <button
+              type="submit"
+              className="
+                mt-2 h-11 w-full rounded-xl bg-red-500 text-white text-base sm:text-lg font-medium
+                hover:bg-red-600 active:scale-[0.99] transition-all duration-300
+              "
+            >
+              Create Account
+            </button>
+          </form>
+
+          <p className="mt-5 text-center text-sm">
+            Already Have An Account?{" "}
+            <Link to="/login" className="text-red-300 underline hover:text-red-200">
+              Login
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );

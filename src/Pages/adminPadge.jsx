@@ -9,6 +9,10 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { MdDashboard } from "react-icons/md";
 import { MdSettingsAccessibility } from "react-icons/md";
+import { FaFilePen } from "react-icons/fa6";
+import { IoMdHome } from "react-icons/io";
+
+
 
 // Pages
 import ProductAdminPage from "./admin/productAdminPage";
@@ -23,11 +27,11 @@ import AddAdminAdminPage from "./admin/addAdminPage";
 import SupplierAdminPage from "./admin/supplierAdminPage";
 import AddSupplier from "./admin/addSupplierPage";
 import UpdateSupplierAdminPage from "./admin/updateSupplier";
-
 import Loader from "../assets/components/loader";
 import TechnicianAdminPage from "./admin/techniciansAdminPage";
 import AddTechnicianAdminPage from "./admin/addTechnicianAdminPage";
 import UpdateTechnicianAdminPage from "./admin/updateTechnicianAdminPage";
+import ReviewsAdminPage from "./admin/reviewAdminPage";
 
 // Sidebar link
 function SidebarLink({ to, icon: Icon, label, onClick }) {
@@ -69,6 +73,8 @@ function DashboardHero() {
           { label: "Orders", to: "/admin/order", icon: FaBoxArchive },
           { label: "Employees", to: "/admin/employee", icon: IoPeople },
           { label: "Suppliers", to: "/admin/supplier", icon: IoPeopleCircleOutline },
+          { label: "Technician", to: "/admin/technicians", icon: IoPeople },
+          { label: "Review", to: "/admin/reviews", icon: IoPeople },
         ].map((c) => (
           <NavLink
             key={c.label}
@@ -127,7 +133,7 @@ export default function AdminPage() {
   };
 
   const handleGoToShop = () => {
-    navigate("/"); // change to '/shop' or your storefront route if needed
+    navigate("/"); 
   };
 
   return (
@@ -150,15 +156,15 @@ export default function AdminPage() {
             {/* New Shop button */}
             <button
               onClick={handleGoToShop}
-              className="rounded-xl border border-white/10 bg-slate-800/60 hover:bg-slate-800 px-3 py-1.5 text-sm font-semibold shadow flex items-center gap-2"
+              className="rounded-xl border border-white/10 cursor-pointer bg-slate-800/60 hover:bg-slate-800 px-3 py-1.5 text-sm font-semibold shadow flex items-center gap-2"
             >
-              <HiShoppingBag className="text-base" />
+              <IoMdHome  className="text-base" />
               Home
             </button>
 
             <button
               onClick={handleLogout}
-              className="rounded-xl bg-red-600/90 hover:bg-red-600 px-3 py-1.5 text-sm font-semibold shadow"
+              className="rounded-xl cursor-pointer bg-red-600/90 hover:bg-red-600 px-3 py-1.5 text-sm font-semibold shadow"
             >
               Logout
             </button>
@@ -204,6 +210,12 @@ export default function AdminPage() {
                 label="Technician"
                 onClick={() => setSidebarOpen(false)}
               />
+              <SidebarLink
+                to="/admin/reviews"
+                icon={FaFilePen }
+                label="Reviews"
+                onClick={() => setSidebarOpen(false)}
+              />
             </nav>
           </div>
         </aside>
@@ -227,6 +239,7 @@ export default function AdminPage() {
             <Route path="technicians" element={<TechnicianAdminPage />} />
             <Route path="newtechnician" element={<AddTechnicianAdminPage />} />
             <Route path="updatetechnician" element={<UpdateTechnicianAdminPage />} />
+            <Route path="reviews" element={<ReviewsAdminPage/>} />
           </Routes>
         </main>
       </div>

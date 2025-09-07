@@ -15,90 +15,137 @@ export default function LoginPage() {
         .post(`${import.meta.env.VITE_BACKEND_URL}/users/googlelogin`, {
           token: response.access_token,
         })
-        .then((response) => {
-          console.log("Google login response:", response.data); // Debug log
-          localStorage.setItem("token", response.data.token);
-          console.log("Token saved:", localStorage.getItem("token")); // Debug token
+        .then((res) => {
+          localStorage.setItem("token", res.data.token);
           toast.success("Login Successful");
-          if (response.data.role === "admin") {
-            navigate("/admin");
-          } else {
-            navigate("/");
-          }
+          if (res.data.role === "admin") navigate("/admin");
+          else navigate("/");
         })
         .catch((error) => {
-          console.error("Google login error:", error.response || error);
           toast.error(error.response?.data?.message || "Google Login Failed");
         });
     },
-    onError: () => {
-      console.error("Google login failed");
-      toast.error("Google Login Failed");
-    },
+    onError: () => toast.error("Google Login Failed"),
   });
 
-  function login() {
+  function login(e) {
+    e?.preventDefault();
     axios
-      .post(`${import.meta.env.VITE_BACKEND_URL}/users/login`, {
-        email: email,
-        password: password,
-      })
-      .then((response) => {
-        console.log("Login response:", response.data); // Debug log
-        localStorage.setItem("token", response.data.token);
-        console.log("Token saved:", localStorage.getItem("token")); // Debug token
+      .post(`${import.meta.env.VITE_BACKEND_URL}/users/login`, { email, password })
+      .then((res) => {
+        localStorage.setItem("token", res.data.token);
         toast.success("Login Successful");
-        if (response.data.role === "admin") {
-          navigate("/admin");
-        } else {
-          navigate("/");
-        }
+        if (res.data.role === "admin") navigate("/admin");
+        else navigate("/");
       })
       .catch((error) => {
-        console.error("Login error:", error.response || error);
         toast.error(error.response?.data?.message || "Login Failed");
       });
   }
 
   return (
-    <div className="w-full h-screen bg-[url(./loginbg.jpg)] bg-cover bg-center flex justify-end items-center px-10">
-      <div className="w-[500px] h-[580px] backdrop-blur-xs rounded-[30px] relative text-white gap-[20px] flex flex-col items-center shadow-[0_-15px_30px_rgba(0,0,0,0.6)] justify-center">
-        <h1 className="text-4xl font-bold text-center my-5 absolute top-[20px]">Login</h1>
-        <div className="w-[350px] flex flex-col items-start gap-2">
-          <span className="text-lg">Email</span>
-          <input
-            onChange={(e) => setEmail(e.target.value)}
-            type="text"
-            className="w-[350px] h-[40px] border border-white rounded-[5px]"
-          />
-        </div>
-        <div className="w-[350px] flex flex-col items-start gap-2">
-          <span className="text-lg">Password</span>
-          <input
-            onChange={(e) => setPassword(e.target.value)}
-            type="password"
-            className="w-[350px] h-[40px] border border-white rounded-[5px]"
-          />
-        </div>
-        <button
-          onClick={login}
-          className="w-[350px] h-[40px] bg-red-600 rounded-xl text-white text-lg mt-5 hover:bg-red-700 transition-all duration-300 cursor-pointer"
+    <div className="relative min-h-screen w-full overflow-hidden">
+      {/* Background */}
+      <div className="absolute inset-0 bg-[url(./loginbg.jpg)] bg-cover bg-center bg-no-repeat" />
+      {/* Overlay for readability */}
+      <div className="absolute inset-0 bg-black/50 md:bg-black/30" />
+
+      {/* Content */}
+      <div className="relative z-10 flex min-h-screen items-center justify-center md:justify-end px-4 sm:px-6">
+        <div
+          className="
+            w-full max-w-md sm:max-w-lg lg:max-w-xl
+            rounded-[30px] border border-white/20 bg-white/10 backdrop-blur-2xl
+            shadow-2xl text-white
+            p-6 sm:p-8 md:mr-10
+            flex flex-col
+          "
         >
-          Login
-        </button>
-        <button
-          onClick={googleLogin}
-          className="w-[350px] h-[40px] rounded-xl text-white text-lg mt-5 transition-all duration-300 cursor-pointer"
-        >
-          <img src="/GoogleLogo.png" className="w-[30px] h-[30px] absolute right-[280px] cursor-pointer" />
-          Google
-        </button>
-        <p>
-          Don't Have an account? <Link to="/signup" className="text-red-400">Sign Up</Link> from here
-        </p>
-        <p>
-          <Link to="/forget" className="text-red-400">Forgot Password?</Link>
-        </p>
+          <h1 className="text-3xl sm:text-4xl font-bold text-center mb-6">Login</h1>
+
+          <form onSubmit={login} className="space-y-4">
+            {/* Email */}
+            <div className="flex flex-col gap-2">
+              <label className="text-sm sm:text-base">Email</label>
+              <input
+                type="email"
+                autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="
+                  h-11 w-full rounded-md border border-white/40 px-3
+                  bg-white/20 placeholder-white/60
+                  focus:outline-none focus:ring-2 focus:ring-white/30
+                "
+                placeholder="Enter your email"
+                required
+              />
+            </div>
+
+            {/* Password */}
+            <div className="flex flex-col gap-2">
+              <label className="text-sm sm:text-base">Password</label>
+              <input
+                type="password"
+                autoComplete="current-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="
+                  h-11 w-full rounded-md border border-white/40 px-3
+                  bg-white/20 placeholder-white/60
+                  focus:outline-none focus:ring-2 focus:ring-white/30
+                "
+                placeholder="Enter your password"
+                required
+              />
+            </div>
+
+            {/* Submit */}
+            <button
+              type="submit"
+              className="
+                mt-2 h-11 w-full rounded-xl bg-red-600 text-white text-base sm:text-lg font-medium
+                hover:bg-red-700 active:scale-[0.99] transition-all duration-300 cursor-pointer
+              "
+            >
+              Login
+            </button>
+          </form>
+
+          {/* Google Login */}
+          <button
+            type="button"
+            onClick={googleLogin}
+            className="
+              mt-3 h-11 w-full rounded-xl border border-white/30 bg-white/10
+              hover:bg-white/20 active:scale-[0.99] transition-all duration-300
+              inline-flex items-center justify-center gap-2
+            "
+          >
+            <img
+              src="/GoogleLogo.png"
+              alt="Google"
+              className="h-5 w-5"
+              loading="lazy"
+            />
+            <span className="font-medium cursor-pointer">Continue with Google</span>
+          </button>
+
+          {/* Links */}
+          <div className="mt-5 space-y-2 text-center text-sm">
+            <p>
+              Don&apos;t have an account?{" "}
+              <Link to="/signup" className="text-red-300 underline hover:text-red-200">
+                Sign Up
+              </Link>
+            </p>
+            <p>
+              <Link to="/forget" className="text-red-300 underline hover:text-red-200">
+                Forgot Password?
+              </Link>
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );
