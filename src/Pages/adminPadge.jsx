@@ -11,6 +11,8 @@ import { MdDashboard } from "react-icons/md";
 import { MdSettingsAccessibility } from "react-icons/md";
 import { FaFilePen } from "react-icons/fa6";
 import { IoMdHome } from "react-icons/io";
+import { FaUser } from "react-icons/fa";
+
 
 
 
@@ -32,6 +34,7 @@ import TechnicianAdminPage from "./admin/techniciansAdminPage";
 import AddTechnicianAdminPage from "./admin/addTechnicianAdminPage";
 import UpdateTechnicianAdminPage from "./admin/updateTechnicianAdminPage";
 import ReviewsAdminPage from "./admin/reviewAdminPage";
+import CustomerAdminPage from "./admin/customerAdminPage";
 
 // Sidebar link
 function SidebarLink({ to, icon: Icon, label, onClick }) {
@@ -69,12 +72,15 @@ function DashboardHero() {
       {/* Quick actions */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
         {[
+          { label: "Admin", to: "/admin/add-admin", icon: RiAdminFill },
           { label: "Products", to: "/admin/product", icon: HiShoppingBag },
           { label: "Orders", to: "/admin/order", icon: FaBoxArchive },
+          { label: "customers", to: "/admin/customers", icon: FaUser  },
           { label: "Employees", to: "/admin/employee", icon: IoPeople },
           { label: "Suppliers", to: "/admin/supplier", icon: IoPeopleCircleOutline },
           { label: "Technician", to: "/admin/technicians", icon: IoPeople },
           { label: "Review", to: "/admin/reviews", icon: IoPeople },
+          
         ].map((c) => (
           <NavLink
             key={c.label}
@@ -195,6 +201,12 @@ export default function AdminPage() {
             <nav className="space-y-1">
               <SidebarLink to="/admin" icon={MdDashboard} label="Dashboard" onClick={() => setSidebarOpen(false)} />
               <SidebarLink to="/admin/add-admin" icon={RiAdminFill} label="Admin" onClick={() => setSidebarOpen(false)} />
+              <SidebarLink
+                to="/admin/customers"
+                icon={FaUser }
+                label="Customers"
+                onClick={() => setSidebarOpen(false)}
+              />
               <SidebarLink to="/admin/employee" icon={IoPeople} label="Employee" onClick={() => setSidebarOpen(false)} />
               <SidebarLink
                 to="/admin/supplier"
@@ -240,6 +252,7 @@ export default function AdminPage() {
             <Route path="newtechnician" element={<AddTechnicianAdminPage />} />
             <Route path="updatetechnician" element={<UpdateTechnicianAdminPage />} />
             <Route path="reviews" element={<ReviewsAdminPage/>} />
+            <Route path="customers" element={<CustomerAdminPage/>} />
           </Routes>
         </main>
       </div>
@@ -248,7 +261,7 @@ export default function AdminPage() {
       <footer className="border-t border-white/10 bg-slate-900/50">
         <div className="mx-auto w-full max-w-[1700px] 2xl:max-w-[95vw] px-3 sm:px-6 lg:px-8 py-4 text-xs text-slate-400 flex items-center justify-between">
           <span>© {new Date().getFullYear()} MicroCCTV Admin</span>
-          <span className="opacity-60">Built with ♥ and Tailwind</span>
+          <span className="opacity-60">Create By Sandaru</span>
         </div>
       </footer>
     </div>
