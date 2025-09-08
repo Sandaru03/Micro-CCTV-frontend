@@ -47,7 +47,7 @@ export default function ProfilePage() {
         const data = res.data;
 
         if (data?.role === "admin") {
-          toast.error("Admins cannot access this page");
+          toast.success("Admins Redirect To Admin Page");
           navigate("/admin");
           return;
         }
