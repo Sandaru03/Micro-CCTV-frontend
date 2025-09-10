@@ -10,11 +10,11 @@ export default function UpdateTechnicianAdminPage() {
 
   const [firstName, setFirstName]   = useState(tech.firstName || "");
   const [lastName,  setLastName]    = useState(tech.lastName || "");
-  const [email]                     = useState(tech.email || ""); // disabled field
+  const [email]                     = useState(tech.email || ""); 
   const [phone, setPhone]           = useState(tech.phone || "Not Given");
   const [salary, setSalary]         = useState(tech.salary || "");
   const [speciality, setSpeciality] = useState(tech.speciality || "");
-  const [newPassword, setNewPassword] = useState(""); // optional
+  const [newPassword, setNewPassword] = useState(""); 
 
   async function handleSubmit() {
     if (!firstName || !lastName || !email || !salary) {
@@ -64,7 +64,7 @@ export default function UpdateTechnicianAdminPage() {
 
       console.log("Technician Updated:", res.data);
       toast.success("Technician successfully updated");
-      navigate("/admin/technician");
+      navigate("/admin/technicians");
     } catch (error) {
       console.error("Error updating technician:", error);
       console.error("Message:", error.message);
@@ -87,13 +87,13 @@ export default function UpdateTechnicianAdminPage() {
 
   if (!tech.email) {
     toast.error("Technician data is not given");
-    navigate("/admin/technician");
+    navigate("/admin/technicians");
     return null;
   }
 
   return (
     <div className="w-full h-screen flex justify-center items-center bg-gray-100 overflow-auto p-4">
-      <div className="w-full max-w-[600px] border-[3px] rounded-[15px] p-[30px] bg-white flex flex-col gap-6">
+      <div className="w-full max-w-[600px] h-[720px] border-[3px] rounded-[15px] p-[30px] bg-white flex flex-col gap-6">
         <h2 className="text-2xl font-bold text-center mb-4">Update Technician</h2>
 
         <div className="flex gap-4">
@@ -176,14 +176,14 @@ export default function UpdateTechnicianAdminPage() {
 
         <div className="flex justify-center gap-4 py-4">
           <Link
-            to="/admin/technician"
+            to="/admin/technicians"
             className="w-[200px] h-[50px] border-2 border-black rounded-md flex justify-center items-center bg-white text-black hover:bg-gray-100 transition"
           >
             Cancel
           </Link>
           <button
             onClick={handleSubmit}
-            className="w-[200px] h-[50px] border-2 border-black rounded-md flex justify-center items-center bg-black text-white hover:bg-gray-800 transition"
+            className="w-[200px] h-[50px] border-2 border-black rounded-md flex justify-center items-center bg-black text-white hover:bg-gray-800 transition cursor-pointer"
           >
             Update Technician
           </button>

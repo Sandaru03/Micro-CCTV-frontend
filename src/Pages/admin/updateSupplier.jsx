@@ -149,7 +149,7 @@ export default function UpdateSupplierAdminPage() {
           </Link>
           <button
             onClick={handleSubmit}
-            className="w-[200px] h-[50px] border-2 border-black rounded-md flex justify-center items-center bg-black text-white hover:bg-gray-800 transition"
+            className="w-[200px] h-[50px] border-2 border-black rounded-md flex justify-center items-center bg-black text-white hover:bg-gray-800 transition cursor-pointer"
           >
             Update Supplier
           </button>

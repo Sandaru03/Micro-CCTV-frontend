@@ -119,8 +119,8 @@ export default function OrdersPageAdmin() {
             {/* 🔹 Popup */}
             {popupVisible && clickOrder && (
               <div className="fixed top-0 left-0 w-full h-full bg-[#00000050] flex justify-center items-center z-50">
-                <div className="w-[700px] max-h-[760px] bg-white rounded-2xl shadow-xl relative p-6">
-
+                <div className="w-[700px] h-[80vh] bg-white rounded-2xl shadow-xl relative p-6 flex flex-col">
+                  
                   {/* Save Changes Button */}
                   {(orderStatus !== clickOrder.status ||
                     ordernotes !== clickOrder.notes) && (
@@ -143,7 +143,7 @@ export default function OrdersPageAdmin() {
                             }
                           );
                           toast.success("Order Updated Successfully");
-                          fetchOrders(); 
+                          fetchOrders();
                           setPopupVisible(false);
                         } catch (err) {
                           console.error(err);
@@ -155,6 +155,7 @@ export default function OrdersPageAdmin() {
                     </button>
                   )}
 
+                  
                   {/* Close Button */}
                   <button
                     className="absolute w-[35px] h-[35px] bg-red-500 border-2 border-red-600 text-white top-[-20px] right-[-20px] rounded-full cursor-pointer hover:bg-transparent hover:text-red-500 font-bold flex items-center justify-center"
@@ -163,112 +164,125 @@ export default function OrdersPageAdmin() {
                     ✕
                   </button>
 
-                  {/* Order Header */}
-                  <h2 className="text-2xl font-bold mb-4 text-gray-800">
-                    Order Details -{" "}
-                    <span className="text-red-600">{clickOrder.orderId}</span>
-                  </h2>
-                  <p className="text-sm text-gray-500 mb-6">
-                    Placed on: {new Date(clickOrder.date).toLocaleString()}
-                  </p>
+                  {/* 🔹 Scrollable Content */}
+                  <div className="overflow-y-auto pr-2 flex-1">
+                    {/* Order Header */}
+                    <h2 className="text-2xl font-bold mb-4 text-gray-800">
+                      Order Details -{" "}
+                      <span className="text-red-600">{clickOrder.orderId}</span>
+                    </h2>
+                    <p className="text-sm text-gray-500 mb-6">
+                      Placed on: {new Date(clickOrder.date).toLocaleString()}
+                    </p>
 
-                  {/* Customer Info */}
-                  <div className="mb-6">
-                    <h3 className="text-lg font-semibold mb-2 text-gray-700">
-                      Customer Information
-                    </h3>
-                    <div className="grid grid-cols-2 gap-4 text-sm text-gray-700">
-                      <p>
-                        <span className="font-medium">Name:</span>{" "}
-                        {clickOrder.name}
-                      </p>
-                      <p>
-                        <span className="font-medium">Email:</span>{" "}
-                        {clickOrder.email}
-                      </p>
-                      <p>
-                        <span className="font-medium">Phone:</span>{" "}
-                        {clickOrder.phone}
-                      </p>
-                      <p>
-                        <span className="font-medium">Address:</span>{" "}
-                        {clickOrder.address}
-                      </p>
+                    {/* Customer Info */}
+                    <div className="mb-6">
+                      <h3 className="text-lg font-semibold mb-2 text-gray-700">
+                        Customer Information
+                      </h3>
+                      <div className="grid grid-cols-2 gap-4 text-sm text-gray-700">
+                        <p>
+                          <span className="font-medium">Name:</span>{" "}
+                          {clickOrder.name}
+                        </p>
+                        <p>
+                          <span className="font-medium">Email:</span>{" "}
+                          {clickOrder.email}
+                        </p>
+                        <p>
+                          <span className="font-medium">Phone:</span>{" "}
+                          {clickOrder.phone}
+                        </p>
+                        <p>
+                          <span className="font-medium">Address:</span>{" "}
+                          {clickOrder.address}
+                        </p>
+                      </div>
                     </div>
-                  </div>
 
-                  {/* Order Status */}
-                  <div className="mb-6">
-                    <h3 className="text-lg font-semibold mb-2 text-gray-700">Order Status</h3>
-                    <span
-                      className={`px-3 py-1 rounded-full text-sm font-medium ${
-                        clickOrder.status === "pending"
-                          ? "bg-yellow-100 text-yellow-700"
-                          : ""
-                      } ${
-                        clickOrder.status === "completed"
-                          ? "bg-green-100 text-green-700"
-                          : ""
-                      } ${
-                        clickOrder.status === "cancelled"
-                          ? "bg-red-100 text-red-700"
-                          : ""
-                      }`}
-                    >
-                      {clickOrder.status}
-                    </span>
-                    <select
-                      className="ml-4 p-1 border rounded text-gray-700"
-                      value={orderStatus}
-                      onChange={(e) => setOrderStatus(e.target.value)}
-                    >
-                      <option value="pending">Pending</option>
-                      <option value="completed">Completed</option>
-                      <option value="cancelled">Cancelled</option>
-                    </select>
-                  </div>
+                    {/* Order Status */}
+                    <div className="mb-6">
+                      <h3 className="text-lg font-semibold mb-2 text-gray-700">
+                        Order Status
+                      </h3>
+                      <span
+                        className={`px-3 py-1 rounded-full text-sm font-medium ${
+                          clickOrder.status === "pending"
+                            ? "bg-yellow-100 text-yellow-700"
+                            : ""
+                        } ${
+                          clickOrder.status === "completed"
+                            ? "bg-green-100 text-green-700"
+                            : ""
+                        } ${
+                          clickOrder.status === "cancelled"
+                            ? "bg-red-100 text-red-700"
+                            : ""
+                        }`}
+                      >
+                        {clickOrder.status}
+                      </span>
+                      <select
+                        className="ml-4 p-1 border rounded text-gray-700"
+                        value={orderStatus}
+                        onChange={(e) => setOrderStatus(e.target.value)}
+                      >
+                        <option value="pending">Pending</option>
+                        <option value="completed">Completed</option>
+                        <option value="cancelled">Cancelled</option>
+                      </select>
+                    </div>
 
-                  {/* Notes */}
-                  <div className="mb-6">
-                    <h3 className="text-lg font-semibold mb-2 text-gray-700">Notes</h3>
-                    <p className="text-sm text-gray-600 italic">{clickOrder.notes}</p>
-                    <textarea
-                      className="w-full h-[50px] p-2 border rounded mt-2 text-gray-700"
-                      value={ordernotes}
-                      onChange={(e) => setOrderNotes(e.target.value)}
-                    ></textarea>
-                  </div>
+                    {/* Notes */}
+                    <div className="mb-6">
+                      <h3 className="text-lg font-semibold mb-2 text-gray-700">
+                        Notes
+                      </h3>
+                      <p className="text-sm text-gray-600 italic">
+                        {clickOrder.notes}
+                      </p>
+                      <textarea
+                        className="w-full h-[50px] p-2 border rounded mt-2 text-gray-700"
+                        value={ordernotes}
+                        onChange={(e) => setOrderNotes(e.target.value)}
+                      ></textarea>
+                    </div>
 
-                  {/* Items */}
-                  <div className="mb-6">
-                    <h3 className="text-lg font-semibold mb-2 text-gray-700">Items</h3>
-                    <div className="space-y-4 max-h-[150px] overflow-y-auto">
-                      {clickOrder.items.map((item) => (
-                        <div
-                          key={item._id}
-                          className="flex items-center gap-4 p-3 border rounded-lg shadow-sm"
-                        >
-                          <img
-                            src={item.image}
-                            alt={item.productName}
-                            className="w-16 h-16 object-cover rounded-md border"
-                          />
-                          <div className="flex-1">
-                            <p className="font-medium text-gray-800">
-                              {item.productName}
+                    {/* Items */}
+                    <div className="mb-6">
+                      <h3 className="text-lg font-semibold mb-2 text-gray-700">
+                        Items
+                      </h3>
+                      <div className="space-y-4">
+                        {clickOrder.items.map((item) => (
+                          <div
+                            key={item._id}
+                            className="flex items-center gap-4 p-3 border rounded-lg shadow-sm"
+                          >
+                            <img
+                              src={item.image}
+                              alt={item.productName}
+                              className="w-16 h-16 object-cover rounded-md border"
+                            />
+                            <div className="flex-1">
+                              <p className="font-medium text-gray-800">
+                                {item.productName}
+                              </p>
+                              <p className="text-sm text-gray-500">
+                                Qty: {item.qty}
+                              </p>
+                            </div>
+                            <p className="font-semibold text-gray-700">
+                              Rs. {item.price * item.qty}
                             </p>
-                            <p className="text-sm text-gray-500">Qty: {item.qty}</p>
                           </div>
-                          <p className="font-semibold text-gray-700">
-                            Rs. {item.price * item.qty}
-                          </p>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
                   </div>
 
-                  {/* Total */}
-                  <div className="flex justify-between items-center border-t pt-4">
+                  {/* Total (fixed bottom) */}
+                  <div className="flex justify-between items-center border-t pt-4 mt-2">
                     <span className="text-xl font-bold text-gray-800">Total</span>
                     <span className="text-xl font-bold text-blue-600">
                       Rs. {clickOrder.total}

@@ -49,12 +49,12 @@ export default function AboutUs() {
         </div>
       </section>
 
-      {/* FOOTER (same as HomePage) */}
+      {/* FOOTER */}
       <footer className="bg-neutral-900 text-neutral-300">
         <div className="max-w-6xl mx-auto px-6 py-12 grid md:grid-cols-4 gap-10">
           <div>
             <div className="flex items-center gap-2 font-semibold text-white">
-              <FaVideo className="w-5 h-5" /> MicroCCTV
+              <img src="MICROCCTVLogo.png" className="w-[100px] h-[100px] "></img>
             </div>
             <p className="mt-4 text-sm opacity-80">
               We provide advanced security solutions, offering 24/7 protection with high-quality systems.
@@ -68,7 +68,7 @@ export default function AboutUs() {
               <li><Link to="/shop" className="hover:text-white/90">SHOP</Link></li>
               <li><Link to="/service" className="hover:text-white/90">SERVICE</Link></li>
               <li><Link to="/about" className="hover:text-white/90">ABOUT</Link></li>
-              <li><Link to="/contact" className="hover:text-white/90">CONTACT</Link></li>
+              <li><Link to="/contact" className="hover:text-white/90">Contact</Link></li>
             </ul>
           </div>
 
@@ -84,8 +84,8 @@ export default function AboutUs() {
           <div>
             <h4 className="text-white font-semibold">Contact Us</h4>
             <ul className="mt-4 space-y-2 text-sm">
-              <li className="text-gray-500">+94 768 841 006</li>
-              <li className="text-gray-500">tharangaviii36@gmail.com</li>
+              <li>+94 702216447</li>
+              <li>sandarudilshan24@gmail.com</li>
             </ul>
           </div>
         </div>

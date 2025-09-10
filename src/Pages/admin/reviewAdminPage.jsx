@@ -11,6 +11,9 @@ export default function ReviewsAdminPage() {
   const [reviews, setReviews] = useState([]);
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState("newest"); // newest | rating-desc | rating-asc
+  const [popupVisible, setPopupVisible] = useState(false);
+  const [clickedReview, setClickedReview] = useState(null);
+
   const navigate = useNavigate();
 
   const fetchAll = useCallback(async () => {
@@ -40,7 +43,9 @@ export default function ReviewsAdminPage() {
     }
   }, [navigate]);
 
-  useEffect(() => { fetchAll(); }, [fetchAll]);
+  useEffect(() => {
+    fetchAll();
+  }, [fetchAll]);
 
   async function handleDelete(id) {
     const token = localStorage.getItem("token");
@@ -57,6 +62,7 @@ export default function ReviewsAdminPage() {
       });
       toast.success("Review deleted");
       setReviews((prev) => prev.filter((r) => (r._id || r.id) !== id));
+      setPopupVisible(false); // close popup if opened
     } catch (err) {
       console.error(err);
       toast.error(err?.response?.data?.message || "Failed to delete review");
@@ -151,19 +157,16 @@ export default function ReviewsAdminPage() {
                 {filtered.map((r) => {
                   const id = r._id || r.id;
                   return (
-                    <tr key={id} className="border-t">
+                    <tr
+                      key={id}
+                      className="border-t hover:bg-slate-100 cursor-pointer"
+                      onClick={() => {
+                        setClickedReview(r);
+                        setPopupVisible(true);
+                      }}
+                    >
                       <td className="px-4 py-3">{fmtDate(r.createdAt)}</td>
-                      <td className="px-4 py-3">
-                        <a
-                          href={`/overview/${r.productId}`}
-                          className="text-blue-600 hover:underline break-all"
-                          target="_blank"
-                          rel="noreferrer"
-                          title="Open product"
-                        >
-                          {r.productId}
-                        </a>
-                      </td>
+                      <td className="px-4 py-3 break-all">{r.productId}</td>
                       <td className="px-4 py-3">{r.userName || r.user || "Customer"}</td>
                       <td className="px-4 py-3">
                         <Stars value={Number(r.rating) || 0} />
@@ -171,16 +174,17 @@ export default function ReviewsAdminPage() {
                       <td className="px-4 py-3 max-w-[520px]">
                         <span className="line-clamp-2 text-slate-700">{r.comment}</span>
                       </td>
-                      <td className="px-4 py-3">
-                        <div className="flex items-center justify-end">
-                          <button
-                            onClick={() => handleDelete(id)}
-                            className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-red-600 text-white hover:bg-red-500"
-                            title="Delete"
-                          >
-                            <RiDeleteBin5Fill />
-                          </button>
-                        </div>
+                      <td className="px-4 py-3 text-right">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDelete(id);
+                          }}
+                          className="cursor-pointer inline-flex items-center justify-center w-9 h-9 rounded-full bg-red-600 text-white hover:bg-red-500"
+                          title="Delete"
+                        >
+                          <RiDeleteBin5Fill />
+                        </button>
                       </td>
                     </tr>
                   );
@@ -189,43 +193,91 @@ export default function ReviewsAdminPage() {
             </table>
           </div>
 
-          {/* Cards (mobile) */}
+          {/* Mobile cards */}
           <div className="md:hidden space-y-3">
             {filtered.map((r) => {
               const id = r._id || r.id;
               return (
-                <div key={id} className="rounded-2xl border p-4">
+                <div
+                  key={id}
+                  className="rounded-2xl border p-4 cursor-pointer hover:bg-slate-100"
+                  onClick={() => {
+                    setClickedReview(r);
+                    setPopupVisible(true);
+                  }}
+                >
                   <div className="flex items-center justify-between gap-3">
                     <div className="text-xs text-slate-500">{fmtDate(r.createdAt)}</div>
                     <Stars value={Number(r.rating) || 0} />
                   </div>
                   <div className="mt-1 font-semibold">{r.userName || r.user || "Customer"}</div>
-                  <div className="mt-1">
-                    <a
-                      href={`/overview/${r.productId}`}
-                      className="text-blue-600 hover:underline break-all"
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      {r.productId}
-                    </a>
-                  </div>
-                  <div className="mt-2 text-slate-700 whitespace-pre-wrap">{r.comment}</div>
-
-                  <div className="mt-3 flex justify-end">
-                    <button
-                      onClick={() => handleDelete(id)}
-                      className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-red-600 text-white hover:bg-red-500"
-                      title="Delete"
-                    >
-                      <RiDeleteBin5Fill />
-                    </button>
+                  <div className="mt-1 break-all text-blue-600">{r.productId}</div>
+                  <div className="mt-2 text-slate-700 whitespace-pre-wrap line-clamp-2">
+                    {r.comment}
                   </div>
                 </div>
               );
             })}
           </div>
         </>
+      )}
+
+      {/* Popup */}
+      {popupVisible && clickedReview && (
+        <div className="fixed top-0 left-0 w-full h-full bg-[#00000070] flex justify-center items-center z-50">
+          <div className="w-[600px] h-[80vh] bg-white rounded-2xl shadow-xl relative p-6 flex flex-col">
+            {/* Close button */}
+            <button
+              className="absolute w-[35px] h-[35px] bg-red-500 border-2 border-red-600 text-white top-[-20px] right-[-20px] rounded-full cursor-pointer hover:bg-transparent hover:text-red-500 font-bold flex items-center justify-center"
+              onClick={() => setPopupVisible(false)}
+            >
+              ✕
+            </button>
+
+            <div className="overflow-y-auto pr-2 flex-1">
+              <h2 className="text-2xl font-bold mb-4 text-gray-800">Review Details</h2>
+              <p className="text-sm text-gray-500 mb-6">
+                Posted on: {fmtDate(clickedReview.createdAt)}
+              </p>
+
+              <div className="mb-4">
+                <h3 className="text-lg font-semibold mb-2">Product</h3>
+                <a
+                  href={`/overview/${clickedReview.productId}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-blue-600 break-all hover:underline"
+                >
+                  {clickedReview.productId}
+                </a>
+              </div>
+
+              <div className="mb-4">
+                <h3 className="text-lg font-semibold mb-2">User</h3>
+                <p>{clickedReview.userName || clickedReview.user || "Customer"}</p>
+              </div>
+
+              <div className="mb-4">
+                <h3 className="text-lg font-semibold mb-2">Rating</h3>
+                <Stars value={Number(clickedReview.rating) || 0} />
+              </div>
+
+              <div className="mb-4">
+                <h3 className="text-lg font-semibold mb-2">Comment</h3>
+                <p className="text-gray-700 whitespace-pre-wrap">{clickedReview.comment}</p>
+              </div>
+            </div>
+
+            <div className="flex justify-end mt-4">
+              <button
+                onClick={() => handleDelete(clickedReview._id || clickedReview.id)}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-500 cursor-pointer"
+              >
+                Delete Review
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

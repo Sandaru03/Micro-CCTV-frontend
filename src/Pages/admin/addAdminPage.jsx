@@ -30,7 +30,7 @@ export default function AddAdminAdminPage() {
       );
 
       toast.success("Admin Added Successfully");
-      navigate("/admin/admins");
+      navigate("/admin/add-admin");
     } catch (err) {
       console.error("Error adding admin:", err);
       toast.error("Failed to add admin");
@@ -54,14 +54,14 @@ export default function AddAdminAdminPage() {
 
         <div className="flex justify-center gap-4 py-4">
           <Link
-            to="/admin/admins"
+            to="/admin/add-admin"
             className="w-[200px] h-[50px] border-2 border-black rounded-md flex justify-center items-center bg-white text-black hover:bg-gray-100 transition"
           >
             Cancel
           </Link>
           <button
             onClick={handleSubmit}
-            className="w-[200px] h-[50px] border-2 border-black rounded-md flex justify-center items-center bg-black text-white hover:bg-gray-800 transition"
+            className="w-[200px] h-[50px] border-2 border-black rounded-md flex justify-center items-center bg-black text-white hover:bg-gray-800 transition cursor-pointer"
           >
             Add Admin
           </button>

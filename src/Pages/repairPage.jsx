@@ -32,10 +32,9 @@ export default function RepairStatusPage() {
   const [params, setParams] = useSearchParams();
   const [serialInput, setSerialInput] = useState(params.get("s") || "");
   const [loading, setLoading] = useState(false);
-  const [matches, setMatches] = useState([]); // array of repairs matched by serial
-  const [selected, setSelected] = useState(null); // chosen repair
+  const [matches, setMatches] = useState([]); 
+  const [selected, setSelected] = useState(null); 
 
-  // Normalize helper
   const norm = (v = "") => v.trim().toLowerCase();
 
   async function fetchBySerial(snRaw) {
@@ -58,16 +57,14 @@ export default function RepairStatusPage() {
         );
         got = resA.data;
       } catch {
-        // ignore → fallback
       }
 
-      // 2) Fallback: fetch all and filter on client
+      // Fallback: fetch all and filter on client
       if (!got) {
         const resB = await axios.get(import.meta.env.VITE_BACKEND_URL + "/repairs");
         got = Array.isArray(resB.data) ? resB.data : [];
         got = got.filter((r) => norm(r?.serialNo) === norm(sn));
       } else {
-        // normalize shapes
         if (!Array.isArray(got)) {
           got = got?.repair ? [got.repair] : [got];
         }
@@ -80,7 +77,6 @@ export default function RepairStatusPage() {
         return;
       }
 
-      // Prefer most recently updated if timestamps exist
       const sorted = [...got].sort((a, b) => {
         const ta = new Date(a.updatedAt || a.createdAt || 0).getTime();
         const tb = new Date(b.updatedAt || b.createdAt || 0).getTime();
@@ -98,15 +94,12 @@ export default function RepairStatusPage() {
     }
   }
 
-  // Auto-run if URL already has ?s=...
   useEffect(() => {
     const s = params.get("s");
     if (s) fetchBySerial(s);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const titleColor = useMemo(() => {
-    // small flourish: change accent by status
     const p = (selected?.progress || "").toLowerCase();
     if (p.includes("completed")) return "from-red-700 to-gray-800";
     if (p.includes("ready")) return "from-red-600 to-gray-800";
@@ -147,7 +140,7 @@ export default function RepairStatusPage() {
             <button
               onClick={() => fetchBySerial(serialInput)}
               disabled={loading}
-              className="h-12 px-6 rounded-xl font-semibold text-white bg-gradient-to-r from-red-600 to-gray-800 shadow hover:opacity-95 disabled:opacity-60"
+              className="cursor-pointer h-12 px-6 rounded-xl font-semibold text-white bg-gradient-to-r from-red-600 to-gray-800 shadow hover:opacity-95 disabled:opacity-60"
             >
               {loading ? "Searching…" : "Search"}
             </button>

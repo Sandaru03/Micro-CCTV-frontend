@@ -41,7 +41,7 @@ export default function AddTechnicianAdminPage() {
       );
 
       toast.success("Technician added successfully");
-      navigate("/admin/technician");
+      navigate("/admin/technicians");
     } catch (err) {
       console.error("Error adding technician:", err);
       const msg = err?.response?.data?.message || "Failed to add technician";
@@ -121,7 +121,7 @@ export default function AddTechnicianAdminPage() {
 
         <div className="flex justify-center gap-4 py-4">
           <Link
-            to="/admin/technician"
+            to="/admin/technicians"
             className="w-[200px] h-[50px] border-2 border-black rounded-md flex justify-center items-center bg-white text-black hover:bg-gray-100 transition"
           >
             Cancel
@@ -129,14 +129,14 @@ export default function AddTechnicianAdminPage() {
 
           <button
             onClick={handleSubmit}
-            className="w-[200px] h-[50px] border-2 border-black rounded-md flex justify-center items-center bg-black text-white hover:bg-gray-800 transition"
+            className="w-[200px] h-[50px] border-2 border-black rounded-md flex justify-center items-center bg-black text-white hover:bg-gray-800 transition cursor-pointer"
           >
             Add Technician
           </button>
         </div>
 
         <p className="text-xs text-gray-500 text-center">
-          Note: Default login password is <span className="font-semibold">tech123</span> (you can change it later).
+          Note: Default login password is <span className="font-semibold">tech123</span>.
         </p>
       </div>
     </div>

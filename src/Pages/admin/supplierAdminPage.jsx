@@ -16,6 +16,7 @@ export default function SupplierAdminPage() {
   const [itemName, setItemName] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [requiredDate, setRequiredDate] = useState("");
+  const [note, setNote] = useState(""); // 🆕 new note field
   const [sending, setSending] = useState(false);
 
   const navigate = useNavigate();
@@ -48,6 +49,7 @@ export default function SupplierAdminPage() {
     setItemName(sup?.item || "");
     setQuantity(1);
     setRequiredDate("");
+    setNote(""); // clear note
     setPopupVisible(true);
   };
 
@@ -57,6 +59,7 @@ export default function SupplierAdminPage() {
     setItemName("");
     setQuantity(1);
     setRequiredDate("");
+    setNote("");
     setSending(false);
   };
 
@@ -95,6 +98,7 @@ export default function SupplierAdminPage() {
           item: itemName.trim(),
           quantity: qtyNum,
           requiredDate,
+          note: note.trim() || null, // 🆕 send note
         },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -221,7 +225,10 @@ export default function SupplierAdminPage() {
               Send Purchase Request
             </h2>
             <p className="text-sm text-gray-500 mb-6">
-              Supplier: <span className="font-semibold">{selectedSupplier.firstName} {selectedSupplier.lastName}</span> {" "}
+              Supplier:{" "}
+              <span className="font-semibold">
+                {selectedSupplier.firstName} {selectedSupplier.lastName}
+              </span>{" "}
               (<span className="text-blue-700">{selectedSupplier.email}</span>)
             </p>
 
@@ -268,9 +275,23 @@ export default function SupplierAdminPage() {
                 />
               </div>
 
-              <div className="flex items-end">
+              {/* 🆕 Note Field */}
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Note (Optional)
+                </label>
+                <textarea
+                  className="w-full border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-gray-700 text-black"
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                  placeholder="Any special instructions or details..."
+                  rows={3}
+                />
+              </div>
+
+              <div className="flex items-end md:col-span-2">
                 <button
-                  className="w-full h-[42px] bg-gray-800 text-white rounded-lg hover:bg-black transition disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="w-full h-[42px] cursor-pointer bg-gray-800 text-white rounded-lg hover:bg-black transition disabled:opacity-60 disabled:cursor-not-allowed"
                   onClick={handleSendRequest}
                   disabled={sending}
                 >

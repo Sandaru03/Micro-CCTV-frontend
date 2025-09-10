@@ -132,7 +132,7 @@ export default function CustomerAdminPage() {
                     <div className="flex items-center justify-center gap-2">
                       <button
                         onClick={() => toggleBlock(cus)}
-                        className={`flex items-center gap-2 px-3 py-2 rounded-lg text-white transition ${
+                        className={`flex items-center cursor-pointer gap-2 px-3 py-2 rounded-lg text-white transition ${
                           cus.isBlock
                             ? "bg-gray-700 hover:bg-gray-900"
                             : "bg-red-600 hover:bg-red-700"

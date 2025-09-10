@@ -202,10 +202,10 @@ export default function HomePage() {
             </h3>
             <div className="flex items-center gap-6 mt-6 text-sm">
               <a href="tel:+94768841006" className="inline-flex items-center gap-2 hover:opacity-90">
-                <FaPhone className="w-4 h-4" /> +94 768 841 006
+                <FaPhone className="w-4 h-4" /> +94 702216447
               </a>
               <a href="mailto:tharangaviii36@gmail.com" className="inline-flex items-center gap-2 hover:opacity-90">
-                <FaEnvelope className="w-4 h-4" /> tharangaviii36@gmail.com
+                <FaEnvelope className="w-4 h-4" /> sandarudilshan24@gmail.com
               </a>
             </div>
           </div>

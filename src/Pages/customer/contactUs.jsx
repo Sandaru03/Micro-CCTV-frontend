@@ -50,71 +50,44 @@ export default function ContactPage() {
 
       {/* FOOTER */}
       <footer className="bg-neutral-900 text-neutral-300">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
-          {/* Brand */}
+        <div className="max-w-6xl mx-auto px-6 py-12 grid md:grid-cols-4 gap-10">
           <div>
             <div className="flex items-center gap-2 font-semibold text-white">
-              <FaVideo className="w-5 h-5" /> MicroCCTV
+              <img src="MICROCCTVLogo.png" className="w-[100px] h-[100px] "></img>
             </div>
             <p className="mt-4 text-sm opacity-80">
-              We provide advanced security solutions, offering 24/7 protection
-              with high-quality systems.
+              We provide advanced security solutions, offering 24/7 protection with high-quality systems.
             </p>
           </div>
 
-          {/* Quick Links */}
           <div>
-            <h4 className="text-white font-semibold">Quick Links</h4>
+            <h4 className="text-white font-semibold">Quick Link</h4>
             <ul className="mt-4 space-y-2 text-sm">
-              <li>
-                <Link to="/" className="hover:text-white/90">
-                  HOME
-                </Link>
-              </li>
-              <li>
-                <Link to="/shop" className="hover:text-white/90">
-                  SHOP
-                </Link>
-              </li>
-              <li>
-                <Link to="/service" className="hover:text-white/90">
-                  SERVICE
-                </Link>
-              </li>
-              <li>
-                <Link to="/about" className="hover:text-white/90">
-                  ABOUT
-                </Link>
-              </li>
-              <li>
-                <Link to="/contact" className="hover:text-white/90">
-                  CONTACT
-                </Link>
-              </li>
+              <li><Link to="/" className="hover:text-white/90">HOME</Link></li>
+              <li><Link to="/shop" className="hover:text-white/90">SHOP</Link></li>
+              <li><Link to="/service" className="hover:text-white/90">SERVICE</Link></li>
+              <li><Link to="/about" className="hover:text-white/90">ABOUT</Link></li>
+              <li><Link to="/contact" className="hover:text-white/90">Contact</Link></li>
             </ul>
           </div>
 
-          {/* Services */}
           <div>
             <h4 className="text-white font-semibold">Services</h4>
             <ul className="mt-4 space-y-2 text-sm">
-              <li>24/7 Service</li>
+              <li>24/7 service</li>
               <li>CCTV Installation</li>
-              <li>Alarm System Installation</li>
+              <li>Alarm system installation</li>
             </ul>
           </div>
 
-          {/* Contact Info */}
           <div>
             <h4 className="text-white font-semibold">Contact Us</h4>
             <ul className="mt-4 space-y-2 text-sm">
-              <li className="text-gray-400">+94 768 841 006</li>
-              <li className="text-gray-400">tharangaviii36@gmail.com</li>
+              <li>+94 702216447</li>
+              <li>sandarudilshan24@gmail.com</li>
             </ul>
           </div>
         </div>
-
-        {/* Copyright */}
         <div className="text-center text-xs py-4 border-t border-white/10">
           Copyright © {new Date().getFullYear()} All Rights Reserved.
         </div>

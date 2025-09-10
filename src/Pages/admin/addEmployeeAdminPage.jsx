@@ -115,7 +115,7 @@ export default function AddEmployeeAdminPage() {
             className="w-full border-[2px] h-[40px] rounded-md px-2"
           >
             <option value="Employee">Employee</option>
-            <option value="Admin">Admin</option>
+            
           </select>
         </div>
 
@@ -128,7 +128,7 @@ export default function AddEmployeeAdminPage() {
           </Link>
           <button
             onClick={handleSubmit}
-            className="w-[200px] h-[50px] border-2 border-black rounded-md flex justify-center items-center bg-black text-white hover:bg-gray-800 transition"
+            className="w-[200px] h-[50px] border-2 border-black rounded-md flex justify-center items-center bg-black text-white hover:bg-gray-800 transition cursor-pointer"
           >
             Add Employee
           </button>
