@@ -22,14 +22,14 @@ export default function ContactPage() {
                 href="tel:+94768841006"
                 className="flex items-center gap-3 font-semibold hover:text-red-600 text-sm sm:text-base"
               >
-                <FaPhone className="w-5 h-5 text-red-600" /> +94 768 841 006
+                <FaPhone className="w-5 h-5 text-red-600" /> +94 702216447
               </a>
               <a
                 href="mailto:tharangaviii36@gmail.com"
                 className="flex items-center gap-3 font-semibold hover:text-red-600 text-sm sm:text-base"
               >
                 <FaEnvelope className="w-5 h-5 text-red-600" />{" "}
-                tharangaviii36@gmail.com
+                sandarudilshan24@gmail.com
               </a>
             </div>
           </div>

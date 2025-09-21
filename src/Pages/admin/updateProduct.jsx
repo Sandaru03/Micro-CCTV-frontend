@@ -143,8 +143,8 @@ export default function UpdateProductPage() {
           <div className="flex-1 flex flex-col gap-1">
             <label className="text-sm font-semibold">Is Available</label>
             <select value={isAvailable} onChange={(e)=>setIsAvailable(e.target.value==="true")} className="w-full border-[2px] h-[40px] rounded-md px-2">
-              <option value={true}>Available</option>
-              <option value={false}>Not Available</option>
+              <option value={true}>InStock</option>
+              <option value={false}>OutOfStock</option>
             </select>
           </div>
 

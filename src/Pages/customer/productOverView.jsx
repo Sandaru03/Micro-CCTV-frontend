@@ -29,7 +29,7 @@ export default function ProductOverViewPage() {
   const [qty, setQty] = useState(1);
 
   // Reviews state
-  const [revStatus, setRevStatus] = useState("idle"); // idle | loading | success | error
+  const [revStatus, setRevStatus] = useState("idle");
   const [reviews, setReviews] = useState([]);
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
@@ -52,7 +52,7 @@ export default function ProductOverViewPage() {
       });
   }, [params.productId]);
 
-  // --- fetch reviews (token-strip to avoid 401 on public route) ---
+  // --- fetch reviews ---
   const fetchReviews = useCallback(
     async (pid) => {
       if (!pid) return;
@@ -60,7 +60,6 @@ export default function ProductOverViewPage() {
         setRevStatus("loading");
         const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/reviews`, {
           params: { productId: pid },
-          // ⛔️ Explicitly strip Authorization so global axios/interceptors don't send a stale token
           headers: { Authorization: "" },
         });
         setReviews(Array.isArray(res.data) ? res.data : []);
@@ -73,7 +72,6 @@ export default function ProductOverViewPage() {
     []
   );
 
-  // load reviews when product ready
   useEffect(() => {
     if (!product) return;
     fetchReviews(getPid(product));
@@ -147,16 +145,12 @@ export default function ProductOverViewPage() {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      // ✅ After success, re-fetch from server to avoid local duplicates/mismatch
       await fetchReviews(getPid(product));
-
-      // reset form
       setComment("");
       setRating(5);
       toast.success("Thank you for your review!");
     } catch (err) {
       console.error(err);
-      // surface server validation message if present
       const msg = err?.response?.data?.message || "Failed to submit review";
       toast.error(msg);
     } finally {
@@ -173,6 +167,13 @@ export default function ProductOverViewPage() {
       );
     }
     return 0;
+  }, [product]);
+
+  // ✅ availability logic
+  const soldOut = useMemo(() => {
+    if (!product) return false;
+    const stockNum = Number(product.stock ?? 0);
+    return !product.isAvailable || stockNum <= 0;
   }, [product]);
 
   return (
@@ -196,14 +197,33 @@ export default function ProductOverViewPage() {
 
               {/* Right: Details */}
               <div className="w-full lg:w-1/2 flex flex-col items-start justify-start lg:pl-6">
-                <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
-                  {product.name}{" "}
-                  {Array.isArray(product.altNames) && product.altNames.length > 0 && (
-                    <span className="block sm:inline font-light text-gray-500 text-base sm:text-xl">
-                      {product.altNames.join(" | ")}
-                    </span>
-                  )}
-                </h1>
+                {/* Title + status badge */}
+                <div className="flex items-start gap-3 w-full flex-wrap">
+                  <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
+                    {product.name}{" "}
+                    {Array.isArray(product.altNames) && product.altNames.length > 0 && (
+                      <span className="block sm:inline font-light text-gray-500 text-base sm:text-xl">
+                        {product.altNames.join(" | ")}
+                      </span>
+                    )}
+                  </h1>
+
+                  <span
+                    className={
+                      "px-3 py-1 text-xs sm:text-sm font-semibold rounded-full mt-1 " +
+                      (soldOut
+                        ? "bg-gray-200 text-gray-700"
+                        : "bg-green-100 text-green-700")
+                    }
+                  >
+                    {soldOut ? "Out of Stock" : "In Stock"}
+                  </span>
+                </div>
+
+                {/* Stock line */}
+                <div className="mt-2 text-sm text-gray-600">
+                  Stock: <b>{Number(product.stock ?? 0)}</b>
+                </div>
 
                 <p className="text-gray-700 text-base sm:text-lg mt-3 sm:mt-4 leading-relaxed">
                   {product.description}
@@ -211,13 +231,13 @@ export default function ProductOverViewPage() {
 
                 {/* Price */}
                 <div className="mt-5 sm:mt-6">
-                  {product.labellPrice > product.price ? (
+                  {Number(product.labellPrice) > Number(product.price) ? (
                     <div className="flex flex-wrap items-center gap-3 sm:gap-4">
                       <span className="text-xl sm:text-2xl font-medium text-gray-500 line-through">
-                        Rs {product.labellPrice.toFixed(2)}
+                        Rs {Number(product.labellPrice).toFixed(2)}
                       </span>
                       <span className="text-2xl sm:text-3xl font-bold text-red-600">
-                        Rs {product.price.toFixed(2)}
+                        Rs {Number(product.price).toFixed(2)}
                       </span>
                       {discountPct > 0 && (
                         <span className="px-3 py-1 text-xs sm:text-sm bg-red-100 text-red-600 font-semibold rounded-md">
@@ -227,7 +247,7 @@ export default function ProductOverViewPage() {
                     </div>
                   ) : (
                     <span className="text-2xl sm:text-3xl font-bold text-gray-900">
-                      Rs {product.price.toFixed(2)}
+                      Rs {Number(product.price).toFixed(2)}
                     </span>
                   )}
                 </div>
@@ -240,9 +260,10 @@ export default function ProductOverViewPage() {
                   <div className="flex items-center gap-2 sm:gap-3">
                     <button
                       type="button"
-                      className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg border cursor-pointer border-gray-300 flex items-center justify-center text-lg sm:text-xl hover:bg-gray-50"
+                      className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg border cursor-pointer border-gray-300 flex items-center justify-center text-lg sm:text-xl hover:bg-gray-50 disabled:opacity-50"
                       onClick={() => setQty((q) => clampQty(q - 1))}
                       aria-label="Decrease quantity"
+                      disabled={soldOut}
                     >
                       –
                     </button>
@@ -254,21 +275,23 @@ export default function ProductOverViewPage() {
                       max={999}
                       value={qty}
                       onChange={(e) => setQty(clampQty(e.target.value))}
-                      className="w-16 sm:w-20 h-9 sm:h-10 rounded-lg border border-gray-300 text-center focus:outline-none focus:ring-2 focus:ring-red-500"
+                      className="w-16 sm:w-20 h-9 sm:h-10 rounded-lg border border-gray-300 text-center focus:outline-none focus:ring-2 focus:ring-red-500 disabled:bg-gray-100"
+                      disabled={soldOut}
                     />
 
                     <button
                       type="button"
-                      className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg border cursor-pointer border-gray-300 flex items-center justify-center text-lg sm:text-xl hover:bg-gray-50"
+                      className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg border cursor-pointer border-gray-300 flex items-center justify-center text-lg sm:text-xl hover:bg-gray-50 disabled:opacity-50"
                       onClick={() => setQty((q) => clampQty(q + 1))}
                       aria-label="Increase quantity"
+                      disabled={soldOut}
                     >
                       +
                     </button>
 
                     <span className="ml-2 sm:ml-4 text-xs sm:text-sm text-gray-600">
                       Subtotal:&nbsp;
-                      <b>Rs {(product.price * qty).toFixed(2)}</b>
+                      <b>Rs {(Number(product.price) * qty).toFixed(2)}</b>
                     </span>
                   </div>
                 </div>
@@ -276,24 +299,38 @@ export default function ProductOverViewPage() {
                 {/* Actions */}
                 <div className="flex flex-row flex-wrap gap-3 sm:gap-4 mt-6 sm:mt-8">
                   <button
-                    className="px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl shadow-lg text-white bg-red-700 border border-red-700 hover:bg-white hover:text-red-700 transition-all duration-300"
+                    className={
+                      "px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl shadow-lg text-white border transition-all duration-300 " +
+                      (soldOut
+                        ? "bg-gray-400 border-gray-400 cursor-not-allowed"
+                        : "bg-red-700 border-red-700 hover:bg-white hover:text-red-700 cursor-pointer")
+                    }
                     onClick={handleBuyNow}
+                    disabled={soldOut}
                   >
-                    Buy Now
+                    {soldOut ? "Out of Stock" : "Buy Now"}
                   </button>
 
                   <button
-                    className={`px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl shadow-lg text-white border transition-all duration-300 ${
-                      adding
+                    className={
+                      "px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl shadow-lg text-white border transition-all duration-300 " +
+                      (soldOut || adding
                         ? "bg-gray-400 border-gray-400 cursor-not-allowed"
-                        : "bg-red-500 border-red-500 hover:bg-white hover:text-red-500"
-                    }`}
+                        : "bg-red-500 border-red-500 hover:bg-white hover:text-red-500 cursor-pointer")
+                    }
                     onClick={handleAddToCart}
-                    disabled={adding}
+                    disabled={soldOut || adding}
                   >
-                    {adding ? "Adding..." : "Add to Cart"}
+                    {soldOut ? "Unavailable" : adding ? "Adding..." : "Add to Cart"}
                   </button>
                 </div>
+
+                {/* Small note when sold out */}
+                {soldOut && (
+                  <div className="mt-3 text-sm text-gray-600">
+                    This item is currently unavailable. Please check back later.
+                  </div>
+                )}
               </div>
             </div>
 
@@ -367,8 +404,6 @@ export default function ProductOverViewPage() {
                     >
                       {submitting ? "Submitting…" : "Submit Review"}
                     </button>
-
-                    
                   </form>
                 </div>
               </div>
