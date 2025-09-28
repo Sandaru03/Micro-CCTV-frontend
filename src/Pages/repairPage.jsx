@@ -49,7 +49,7 @@ export default function RepairStatusPage() {
     setSelected(null);
 
     try {
-      // 1) Try dedicated endpoint
+      //Try dedicated endpoint
       let got = null;
       try {
         const resA = await axios.get(
