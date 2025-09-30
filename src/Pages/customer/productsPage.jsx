@@ -5,6 +5,7 @@ import Loader from "../../assets/components/loader";
 import ProductCard from "../../assets/components/productCard";
 import { HiX } from "react-icons/hi";
 import { FaSearch } from "react-icons/fa";
+import { FiFilter } from "react-icons/fi";
 
 const CATEGORY_MAP = {
   all: "All",
@@ -21,7 +22,6 @@ function isSoldOut(p) {
   return !p?.isAvailable || stockNum <= 0;
 }
 
-// Prefer createdAt, else fallback to ObjectId timestamp, else 0
 function createdTimeMs(p) {
   if (p?.createdAt) {
     const t = Date.parse(p.createdAt);
@@ -39,7 +39,7 @@ export default function ProductsPage({ refreshTrigger }) {
   const [products, setProducts] = useState([]);
   const [status, setStatus] = useState("loading");
 
-  // Search & filters
+  // Filters
   const [query, setQuery] = useState("");
   const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(50000);
@@ -53,9 +53,9 @@ export default function ProductsPage({ refreshTrigger }) {
   // Mobile filter drawer
   const [filtersOpen, setFiltersOpen] = useState(false);
 
-  // Top bar ref (mobile)
   const topbarRef = useRef(null);
   const [topOffset, setTopOffset] = useState(0);
+
   const measureTopbar = () => {
     const h = topbarRef.current?.getBoundingClientRect()?.height || 0;
     setTopOffset(h);
@@ -72,7 +72,6 @@ export default function ProductsPage({ refreshTrigger }) {
     if (filtersOpen) requestAnimationFrame(measureTopbar);
   }, [filtersOpen, query, sort]);
 
-  // Fetch products (include unavailable so OOS also show)
   async function fetchProducts(searchTerm = "") {
     try {
       setStatus("loading");
@@ -90,7 +89,7 @@ export default function ProductsPage({ refreshTrigger }) {
       }
       setProducts(res.data || []);
       setStatus("success");
-      setCurrentPage(1); // reset pagination on new fetch
+      setCurrentPage(1);
     } catch (err) {
       console.error(err);
       setStatus("error");
@@ -101,12 +100,10 @@ export default function ProductsPage({ refreshTrigger }) {
     fetchProducts("");
   }, []);
 
-  // Refresh when admin adds new product
   useEffect(() => {
     if (refreshTrigger) fetchProducts(query);
-  }, [refreshTrigger]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [refreshTrigger]); // eslint-disable-line
 
-  // Category counts (include OOS)
   const categoryCounts = useMemo(() => {
     const counts = {};
     products.forEach((p) => {
@@ -117,25 +114,21 @@ export default function ProductsPage({ refreshTrigger }) {
     return counts;
   }, [products]);
 
-  // Price guard
   const [lo, hi] = useMemo(() => {
     const a = Number(minPrice) || 0;
     const b = Number(maxPrice) || 0;
     return a <= b ? [a, b] : [b, a];
   }, [minPrice, maxPrice]);
 
-  // Filter + sort + group (In-Stock first, then OOS)
   const filteredProducts = useMemo(() => {
     let list = [...products];
 
-    // Category first
     if (categoryFilter !== "all") {
       list = list.filter(
         (p) => (p.category || "").toLowerCase() === categoryFilter.toLowerCase()
       );
     }
 
-    // Search (name + altNames)
     if (query.trim()) {
       const q = query.toLowerCase();
       list = list.filter((p) => {
@@ -147,13 +140,11 @@ export default function ProductsPage({ refreshTrigger }) {
       });
     }
 
-    // Price
     list = list.filter((p) => {
       const price = Number(p.price) || 0;
       return price >= lo && price <= hi;
     });
 
-    // Split by availability (to keep In-Stock at the top for "latest")
     const inStock = [];
     const outOfStock = [];
     for (const p of list) {
@@ -161,48 +152,33 @@ export default function ProductsPage({ refreshTrigger }) {
       else inStock.push(p);
     }
 
-    // Sorting
     if (sort === "latest") {
-      // ✅ Newest FIRST among In-Stock only
       inStock.sort((a, b) => createdTimeMs(b) - createdTimeMs(a));
-      // (Optional) keep OOS newest-first too
       outOfStock.sort((a, b) => createdTimeMs(b) - createdTimeMs(a));
       return [...inStock, ...outOfStock];
     }
 
     if (sort === "price-low-high") {
-      // Sort each bucket then concat so OOS still stays at bottom
-      inStock.sort(
-        (a, b) => (Number(a.price) || 0) - (Number(b.price) || 0)
-      );
-      outOfStock.sort(
-        (a, b) => (Number(a.price) || 0) - (Number(b.price) || 0)
-      );
+      inStock.sort((a, b) => (Number(a.price) || 0) - (Number(b.price) || 0));
+      outOfStock.sort((a, b) => (Number(a.price) || 0) - (Number(b.price) || 0));
       return [...inStock, ...outOfStock];
     }
 
     if (sort === "price-high-low") {
-      inStock.sort(
-        (a, b) => (Number(b.price) || 0) - (Number(a.price) || 0)
-      );
-      outOfStock.sort(
-        (a, b) => (Number(b.price) || 0) - (Number(a.price) || 0)
-      );
+      inStock.sort((a, b) => (Number(b.price) || 0) - (Number(a.price) || 0));
+      outOfStock.sort((a, b) => (Number(b.price) || 0) - (Number(a.price) || 0));
       return [...inStock, ...outOfStock];
     }
 
-    // default fallback
     return [...inStock, ...outOfStock];
   }, [products, query, lo, hi, categoryFilter, sort]);
 
-  // Pagination
   const totalPages = Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE);
   const paginatedProducts = useMemo(() => {
     const start = (currentPage - 1) * PRODUCTS_PER_PAGE;
     return filteredProducts.slice(start, start + PRODUCTS_PER_PAGE);
   }, [filteredProducts, currentPage]);
 
-  // Reset filters
   const resetFilters = () => {
     setQuery("");
     setMinPrice(0);
@@ -213,7 +189,6 @@ export default function ProductsPage({ refreshTrigger }) {
     fetchProducts("");
   };
 
-  // Price presets
   const pricePresets = [
     { label: "Under 10k", min: 0, max: 10000 },
     { label: "10k – 25k", min: 10000, max: 25000 },
@@ -225,29 +200,44 @@ export default function ProductsPage({ refreshTrigger }) {
     setCurrentPage(1);
   };
 
-  // Filter button styles
-  const activeBtn =
-    "w-full text-left px-3 py-2 rounded-xl bg-red-600 text-white shadow-sm hover:bg-red-700 transition";
-  const idleBtn =
-    "w-full text-left px-3 py-2 rounded-xl bg-gray-100 text-gray-700 hover:bg-gray-200 transition";
-
   return (
     <div className="w-full min-h-screen flex bg-white">
       {/* Desktop sidebar */}
       <aside className="hidden md:block w-[300px] xl:w-[320px] min-h-screen border-r bg-gray-50/80 backdrop-blur-sm">
         <div className="h-[100dvh] sticky top-0 p-6 overflow-y-auto">
-          {/* Filters panel */}
           <FiltersPanel />
         </div>
       </aside>
 
       {/* Main */}
       <main className="flex-1 min-h-screen overflow-y-auto">
-        {/* Mobile top bar placeholder */}
+        {/* Mobile top bar with filter + sort button */}
         <div
           ref={topbarRef}
-          className="md:hidden sticky top-0 z-20 bg-white/90 backdrop-blur border-b"
-        />
+          className="md:hidden sticky top-0 z-20 bg-white/90 backdrop-blur border-b flex items-center justify-between px-4 py-3"
+        >
+          <span className="font-bold text-lg">Shop</span>
+          <div className="flex items-center gap-2">
+            <select
+              value={sort}
+              onChange={(e) => {
+                setSort(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="border rounded-xl px-3 py-2 text-sm"
+            >
+              <option value="latest">Latest</option>
+              <option value="price-low-high">Price: Low → High</option>
+              <option value="price-high-low">Price: High → Low</option>
+            </select>
+            <button
+              onClick={() => setFiltersOpen(true)}
+              className="flex items-center gap-2 px-3 py-2 rounded-xl bg-red-600 text-white hover:bg-red-700 active:scale-95 transition"
+            >
+              <FiFilter size={16} /> Filters
+            </button>
+          </div>
+        </div>
 
         {/* Content */}
         {status === "loading" ? (
@@ -292,10 +282,7 @@ export default function ProductsPage({ refreshTrigger }) {
                       key={product.productId || product._id || product.id}
                       className="relative"
                     >
-                      {/* Card */}
                       <ProductCard product={product} />
-
-                      {/* OOS badge overlay */}
                       {soldOut && (
                         <span className="absolute top-2 left-2 px-2 py-1 rounded-md text-[10px] font-semibold bg-gray-900/90 text-white">
                           OUT OF STOCK
@@ -343,17 +330,20 @@ export default function ProductsPage({ refreshTrigger }) {
             className="absolute inset-0 bg-black/40"
             onClick={() => setFiltersOpen(false)}
           />
-          <div className="absolute left-0 top-0 h-full w-[85%] max-w-[360px] bg-gray-50 shadow-2xl p-6 overflow-y-auto">
+          <div className="absolute left-0 top-0 h-full w-[85%] max-w-[360px] bg-gray-50 shadow-2xl p-6 overflow-y-auto flex flex-col">
             <div className="flex items-center justify-between mb-4">
               <span className="text-lg font-bold">Filters</span>
-              <button
-                className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-white border hover:bg-gray-50"
-                onClick={() => setFiltersOpen(false)}
-              >
-                <HiX size={18} />
-              </button>
             </div>
             <FiltersPanel />
+            {/* Close button moved down */}
+            <div className="mt-6">
+              <button
+                className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-red-600 text-white hover:bg-red-700"
+                onClick={() => setFiltersOpen(false)}
+              >
+                <HiX size={18} /> Close Filters
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -363,13 +353,6 @@ export default function ProductsPage({ refreshTrigger }) {
   function FiltersPanel() {
     return (
       <div className="flex flex-col gap-6">
-        <div>
-          <span className="block text-2xl font-extrabold text-gray-900">
-            Shop
-          </span>
-          <p className="text-sm text-gray-500">Find your products</p>
-        </div>
-
         {/* Search */}
         <div className="space-y-2">
           <label className="text-sm font-semibold text-gray-700">Search</label>
@@ -470,7 +453,7 @@ export default function ProductsPage({ refreshTrigger }) {
                   key={c}
                   onClick={() => {
                     setCategoryFilter(c);
-                    setCurrentPage(1); // reset pagination when switching category
+                    setCurrentPage(1);
                   }}
                   className={active ? clsActive : clsIdle}
                 >
@@ -479,7 +462,9 @@ export default function ProductsPage({ refreshTrigger }) {
                     <span
                       className={
                         "text-xs px-2 py-0.5 rounded-full " +
-                        (active ? "bg-white/20 text-white" : "bg-gray-200 text-gray-700")
+                        (active
+                          ? "bg-white/20 text-white"
+                          : "bg-gray-200 text-gray-700")
                       }
                     >
                       {categoryCounts[c] || 0}
